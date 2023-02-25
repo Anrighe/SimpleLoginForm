@@ -43,18 +43,23 @@ class Interface:
 
         # Initial verification of the Database's reachability
         self.__verifier = Connector(verifier=True)
-        self.__reachable = self.__verifier.isDatabaseReachable
-        if self.__reachable:
-            self.__usernameEntry.configure(state=ctk.NORMAL)
-            self.__passwordEntry.configure(state=ctk.NORMAL)
-            self.__connectionLabel.configure(text='Connected', text_color='green')
+        self.__updateReachability()
 
         self.__window.mainloop()
 
     def __login(self):
+        self.__updateReachability()
         if not (self.__usernameEntry.get() == '' or self.__passwordEntry.get() == ''):
             self.__connector = Connector(self.__usernameEntry.get(), self.__passwordEntry.get())
             if self.__connector.connect() is True:
                 self.__titleLabel.configure(text_color='green')
             else:
                 self.__titleLabel.configure(text_color='red')
+
+    def __updateReachability(self):
+        if self.__verifier.isDatabaseReachable:
+            self.__usernameEntry.configure(state=ctk.NORMAL)
+            self.__passwordEntry.configure(state=ctk.NORMAL)
+            self.__connectionLabel.configure(text='Connected', text_color='green')
+        else:
+            self.__connectionLabel.configure(text='Not connected', text_color='red')
