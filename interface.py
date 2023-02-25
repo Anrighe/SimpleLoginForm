@@ -40,7 +40,6 @@ class Interface:
 
         self.__connectionLabel.pack(side=ctk.BOTTOM, anchor="e", padx=8, pady=8)
 
-
         # Initial verification of the Database's reachability
         self.__verifier = Connector(verifier=True)
         self.__updateReachability()
