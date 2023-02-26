@@ -4,12 +4,16 @@ import customtkinter as ctk
 
 class Interface:
     def __init__(self):
-        self.__screenWidth = 330
-        self.__screenHeight = 400
+        self.__windowWidth = 330
+        self.__windowHeight = 400
         self.__window = ctk.CTk()
+        self.__screenWidth = self.__window.winfo_screenwidth()
+        self.__screenHeight = self.__window.winfo_screenheight()
+        self.__x = (self.__screenWidth // 2) - (self.__window.winfo_reqwidth() // 2)
+        self.__y = (self.__screenHeight // 2) - (self.__window.winfo_reqheight() // 2)
         self.__window.resizable(False, False)
         self.__window.title("Login")
-        self.__window.geometry(f'{self.__screenWidth}x{self.__screenHeight}')
+        self.__window.geometry("+{}+{}".format(self.__x, self.__y))
 
         self.__titleLabel = ctk.CTkLabel(self.__window, text='Simple Login Form', text_color='lightblue', font=('@NSimSun', 28, 'bold'))
 
@@ -80,7 +84,10 @@ class Interface:
     def __register(self, event):
         self.__topRegister = ctk.CTkToplevel()  # Creates a Toplevel window
         self.__topRegister.title('Register')
-        self.__topRegister.geometry('330x400')
+        self.__x = (self.__screenWidth // 2) - (self.__topRegister.winfo_reqwidth() // 2)
+        self.__y = (self.__screenHeight // 2) - (self.__topRegister.winfo_reqheight() // 2)
+        self.__topRegister.geometry("+{}+{}".format(self.__x, self.__y))
+        self.__topRegister.geometry(f'{self.__windowWidth}x{self.__windowHeight}')
         self.__topRegister.resizable(False, False)
         self.__topRegister.attributes('-topmost', True)
 
@@ -104,7 +111,7 @@ class Interface:
         self.__registerButton = ctk.CTkButton(self.__topRegister, text='Register', text_color='lightblue',
                                               font=('@NSimSun', 20, 'bold'), command=self.__registerRequest)
 
-        self.__registerTitleLabel.pack(pady=35)
+        self.__registerTitleLabel.pack(pady=30)
 
         self.__registrationFeedbackLabel.pack()
 
@@ -148,6 +155,85 @@ class Interface:
         if not self.__termsBox.get():
             self.__termsBox.configure(text_color='red')
 
-
     def __resetPassword(self, event):
-        print("RESET")
+        self.__topReset = ctk.CTkToplevel()  # Creates a Toplevel window
+        self.__topReset.title('Register')
+        self.__x = (self.__screenWidth // 2) - (self.__topReset.winfo_reqwidth() // 2)
+        self.__y = (self.__screenHeight // 2) - (self.__topReset.winfo_reqheight() // 2)
+        self.__topReset.geometry("+{}+{}".format(self.__x, self.__y))
+        self.__topReset.geometry(f'{self.__windowWidth}x{self.__windowHeight}')
+        self.__topReset.resizable(False, False)
+        self.__topReset.attributes('-topmost', True)
+
+        self.__resetTitleLabel = ctk.CTkLabel(self.__topReset, text='Reset password', text_color='lightblue',
+                                              font=('@NSimSun', 28, 'bold'))
+
+        self.__resetFeedbackLabel = ctk.CTkLabel(self.__topReset, text='', text_color='lightblue')
+
+        self.__resetUsernameEntry = ctk.CTkEntry(self.__topReset, placeholder_text='Username',
+                                                 placeholder_text_color='lightblue', width=270)
+
+        self.__resetOldPasswordEntry = ctk.CTkEntry(self.__topReset, show='*', placeholder_text_color='lightblue',
+                                                    placeholder_text='Old password', width=270)
+
+        self.__resetNewPasswordEntry = ctk.CTkEntry(self.__topReset, show='*', placeholder_text_color='lightblue',
+                                                    placeholder_text='New password', width=270)
+
+        self.__repeatResetNewPasswordEntry = ctk.CTkEntry(self.__topReset, show='*',
+                                                          placeholder_text_color='lightblue',
+                                                          placeholder_text='Confirm new password', width=270)
+
+        self.__resetButton = ctk.CTkButton(self.__topReset, text='Reset password', text_color='lightblue',
+                                           font=('@NSimSun', 20, 'bold'), command=self.__resetRequest)
+
+        self.__resetTitleLabel.pack(pady=25)
+
+        self.__resetFeedbackLabel.pack()
+
+        self.__resetUsernameEntry.pack(pady=10)
+
+        self.__resetOldPasswordEntry.pack(pady=10)
+
+        self.__resetNewPasswordEntry.pack(pady=10)
+
+        self.__repeatResetNewPasswordEntry.pack(pady=10)
+
+        self.__resetButton.pack(pady=30)
+
+    def __resetRequest(self):
+        self.__resetUsernameEntry.configure(placeholder_text_color='lightblue')
+        self.__resetOldPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
+        self.__resetNewPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
+        self.__repeatResetNewPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
+
+        if not (self.__resetUsernameEntry.get() == '' or self.__resetOldPasswordEntry.get() == ''
+                or self.__resetNewPasswordEntry.get() == '' or self.__repeatResetNewPasswordEntry.get() == ''):
+            if self.__resetNewPasswordEntry.get() == self.__repeatResetNewPasswordEntry.get():
+
+                # Checks for a user with the specified username and the old password
+                self.__connector = Connector(self.__resetUsernameEntry.get(), self.__resetOldPasswordEntry.get())
+
+                if self.__verifier.isDatabaseReachable and self.__connector.connect():
+                    self.__resetFeedbackLabel.configure(text='User has been found', text_color='green')
+                    self.__connector = Connector(self.__resetUsernameEntry.get(), self.__resetNewPasswordEntry.get())
+                    if self.__connector.resetPassword():
+                        self.__resetFeedbackLabel.configure(text='Successfully changed password', text_color='green')
+                    else:
+                        self.__resetFeedbackLabel.configure(text='Could not change password', text_color='red')
+                else:
+                    self.__resetFeedbackLabel.configure(text='No user found', text_color='red')
+
+        if self.__resetUsernameEntry.get() == '':
+            self.__resetUsernameEntry.configure(placeholder_text_color='red')
+
+        if self.__resetOldPasswordEntry.get() == '':
+            self.__resetOldPasswordEntry.configure(placeholder_text_color='red')
+
+        if self.__resetNewPasswordEntry.get() == '':
+            self.__resetNewPasswordEntry.configure(placeholder_text_color='red')
+
+        if self.__resetNewPasswordEntry.get() != self.__repeatResetNewPasswordEntry.get():
+            self.__repeatResetNewPasswordEntry.configure(text_color='red')
+
+        if self.__repeatResetNewPasswordEntry.get() == '':
+            self.__repeatResetNewPasswordEntry.configure(placeholder_text_color='red')

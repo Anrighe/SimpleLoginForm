@@ -4,7 +4,8 @@ from configparser import ConfigParser
 
 class Connector:
     def __init__(self, username='', password='', verifier=False):
-        self.__registrationSuccessful = None
+        self.__resetComplete = None
+        self.__registrationComplete = None
         self.__cur = None
         self.__params = None
         self.__conn = None
@@ -75,7 +76,7 @@ class Connector:
     def register(self):
         """Registers a user to the PostgreSQL database server"""
         self.__conn = None
-        self.__registrationSuccessful = False
+        self.__registrationComplete = False
         try:
             # Reads connection parameters
             self.__params = self.__config()
@@ -87,12 +88,10 @@ class Connector:
             self.__cur = self.__conn.cursor()
 
             # Registers the user
-            print(self.__username)
-            print(self.__password)
             self.__cur.execute(f'INSERT INTO users (username, password) VALUES (%s, crypt(%s, gen_salt(\'bf\')))', (self.__username, self.__password))
 
             self.__conn.commit()
-            self.__registrationSuccessful = True
+            self.__registrationComplete = True
 
             # Closes the communication with the PostgreSQL
             self.__cur.close()
@@ -101,11 +100,36 @@ class Connector:
         finally:
             if self.__conn is not None:
                 self.__conn.close()
-                # Displays the query result
-                if not self.__registrationSuccessful:
-                    return False
-                else:
-                    return True
+                return self.__registrationComplete
+
+    def resetPassword(self):
+        """Resets a password of a user already registered in the PostgreSQL database server"""
+        self.__conn = None
+        self.__resetComplete = False
+        try:
+            # Reads connection parameters
+            self.__params = self.__config()
+
+            # Connects to the PostgreSQL server
+            self.__conn = psycopg2.connect(**self.__params)
+
+            # Creates a cursor
+            self.__cur = self.__conn.cursor()
+
+            # Resets the user password
+            self.__cur.execute('UPDATE users SET password = crypt(%s, gen_salt(\'bf\')) WHERE username = %s', (self.__password, self.__username))
+
+            self.__conn.commit()
+            self.__resetComplete = True
+
+            # Closes the communication with the PostgreSQL
+            self.__cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if self.__conn is not None:
+                self.__conn.close()
+                return self.__resetComplete
 
     def __verify(self):
         """Verifies the reachability of the PostgreSQL database server"""
