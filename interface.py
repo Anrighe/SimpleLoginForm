@@ -1,6 +1,6 @@
 from dbconnector import Connector
 import customtkinter as ctk
-import time
+
 
 class Interface:
     def __init__(self):
@@ -119,22 +119,19 @@ class Interface:
         self.__registerButton.pack(pady=15)
 
     def __registerRequest(self):
+        self.__termsBox.configure(text_color='lightblue')
+        self.__registerUsernameEntry.configure(placeholder_text_color='lightblue')
+        self.__registerPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
+        self.__repeatRegisterPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
         if self.__termsBox.get():
-            self.__termsBox.configure(text_color='lightblue')
             if not (self.__registerUsernameEntry.get() == '' or self.__registerPasswordEntry.get() == '' or self.__repeatRegisterPasswordEntry.get() == ''):
-                self.__registerUsernameEntry.configure(placeholder_text_color='lightblue')
                 if self.__registerPasswordEntry.get() == self.__repeatRegisterPasswordEntry.get():
-                    self.__registerPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
-                    self.__repeatRegisterPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
-
                     self.__connector = Connector(self.__registerUsernameEntry.get(), self.__registerPasswordEntry.get())
 
                     if self.__verifier.isDatabaseReachable and self.__connector.register():
-                        self.__registrationFeedbackLabel.configure(text='The registration was successful.',
-                                                                   text_color='green')
+                        self.__registrationFeedbackLabel.configure(text='The registration was successful.', text_color='green')
                     else:
-                        self.__registrationFeedbackLabel.configure(text='Error during the registration.',
-                                                                   text_color='red')
+                        self.__registrationFeedbackLabel.configure(text='Error during the registration.', text_color='red')
 
         if self.__registerUsernameEntry.get() == '':
             self.__registerUsernameEntry.configure(placeholder_text_color='red')
@@ -146,7 +143,6 @@ class Interface:
             self.__repeatRegisterPasswordEntry.configure(placeholder_text_color='red')
 
         if self.__registerPasswordEntry.get() != self.__repeatRegisterPasswordEntry.get():
-            self.__registerPasswordEntry.configure(text_color='red')
             self.__repeatRegisterPasswordEntry.configure(text_color='red')
 
         if not self.__termsBox.get():
