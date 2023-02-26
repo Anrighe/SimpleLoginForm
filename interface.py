@@ -20,10 +20,12 @@ class Interface:
         self.__usernameFrame = ctk.CTkFrame(self.__window, fg_color=self.__window.fg_color)
         self.__usernameLabel = ctk.CTkLabel(self.__usernameFrame, text='Username', text_color='lightblue', font=('@NSimSun', 20))
         self.__usernameEntry = ctk.CTkEntry(self.__usernameFrame, state=ctk.DISABLED)
+        self.__usernameEntry.bind('<Return>', lambda e: self.__login())
 
         self.__passwordFrame = ctk.CTkFrame(self.__window, fg_color=self.__window.fg_color)
         self.__passwordLabel = ctk.CTkLabel(self.__passwordFrame, text='Password', text_color='lightblue', font=('@NSimSun', 20))
         self.__passwordEntry = ctk.CTkEntry(self.__passwordFrame, state=ctk.DISABLED, show='*')
+        self.__passwordEntry.bind('<Return>', lambda e: self.__login())
 
         self.__loginButton = ctk.CTkButton(self.__window, text='Login', text_color='lightblue', font=('@NSimSun', 20, 'bold'),
                                            command=self.__login)
