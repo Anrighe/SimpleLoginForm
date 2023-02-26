@@ -84,8 +84,10 @@ class Interface:
         self.__topRegister.resizable(False, False)
         self.__topRegister.attributes('-topmost', True)
 
-        self.__registerLabel = ctk.CTkLabel(self.__topRegister, text='Register', text_color='lightblue',
-                                            font=('@NSimSun', 28, 'bold'))
+        self.__registerTitleLabel = ctk.CTkLabel(self.__topRegister, text='Register', text_color='lightblue',
+                                                 font=('@NSimSun', 28, 'bold'))
+
+        self.__registrationFeedbackLabel = ctk.CTkLabel(self.__topRegister, text='', text_color='lightblue')
 
         self.__registerUsernameEntry = ctk.CTkEntry(self.__topRegister, placeholder_text='Username',
                                                     placeholder_text_color='lightblue', width=270)
@@ -102,7 +104,9 @@ class Interface:
         self.__registerButton = ctk.CTkButton(self.__topRegister, text='Register', text_color='lightblue',
                                               font=('@NSimSun', 20, 'bold'), command=self.__registerRequest)
 
-        self.__registerLabel.pack(pady=35)
+        self.__registerTitleLabel.pack(pady=35)
+
+        self.__registrationFeedbackLabel.pack()
 
         self.__registerUsernameEntry.pack(pady=10)
 
@@ -112,7 +116,7 @@ class Interface:
 
         self.__termsBox.pack(pady=20)
 
-        self.__registerButton.pack(pady=5)
+        self.__registerButton.pack(pady=15)
 
     def __registerRequest(self):
         if self.__termsBox.get():
@@ -123,17 +127,29 @@ class Interface:
                     self.__registerPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
                     self.__repeatRegisterPasswordEntry.configure(placeholder_text_color='lightblue', text_color='lightblue')
 
+                    self.__connector = Connector(self.__registerUsernameEntry.get(), self.__registerPasswordEntry.get())
+
+                    if self.__verifier.isDatabaseReachable and self.__connector.register():
+                        self.__registrationFeedbackLabel.configure(text='The registration was successful.',
+                                                                   text_color='green')
+                    else:
+                        self.__registrationFeedbackLabel.configure(text='Error during the registration.',
+                                                                   text_color='red')
+
         if self.__registerUsernameEntry.get() == '':
             self.__registerUsernameEntry.configure(placeholder_text_color='red')
+
         if self.__registerPasswordEntry.get() == '':
             self.__registerPasswordEntry.configure(placeholder_text_color='red')
+
         if self.__repeatRegisterPasswordEntry.get() == '':
             self.__repeatRegisterPasswordEntry.configure(placeholder_text_color='red')
+
         if self.__registerPasswordEntry.get() != self.__repeatRegisterPasswordEntry.get():
             self.__registerPasswordEntry.configure(text_color='red')
             self.__repeatRegisterPasswordEntry.configure(text_color='red')
 
-        if self.__termsBox.get() == 0:
+        if not self.__termsBox.get():
             self.__termsBox.configure(text_color='red')
 
 

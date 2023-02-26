@@ -4,6 +4,7 @@ from configparser import ConfigParser
 
 class Connector:
     def __init__(self, username='', password='', verifier=False):
+        self.__registrationSuccessful = None
         self.__cur = None
         self.__params = None
         self.__conn = None
@@ -67,6 +68,41 @@ class Connector:
                 self.__conn.close()
                 # Displays the query result
                 if not self.__result:
+                    return False
+                else:
+                    return True
+
+    def register(self):
+        """Registers a user to the PostgreSQL database server"""
+        self.__conn = None
+        self.__registrationSuccessful = False
+        try:
+            # Reads connection parameters
+            self.__params = self.__config()
+
+            # Connects to the PostgreSQL server
+            self.__conn = psycopg2.connect(**self.__params)
+
+            # Creates a cursor
+            self.__cur = self.__conn.cursor()
+
+            # Registers the user
+            print(self.__username)
+            print(self.__password)
+            self.__cur.execute(f'INSERT INTO users (username, password) VALUES (%s, crypt(%s, gen_salt(\'bf\')))', (self.__username, self.__password))
+
+            self.__conn.commit()
+            self.__registrationSuccessful = True
+
+            # Closes the communication with the PostgreSQL
+            self.__cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if self.__conn is not None:
+                self.__conn.close()
+                # Displays the query result
+                if not self.__registrationSuccessful:
                     return False
                 else:
                     return True
