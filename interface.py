@@ -6,6 +6,7 @@ class Interface:
     def __init__(self):
         self.__windowWidth = 330
         self.__windowHeight = 400
+        self.__spawnOffset = 30
         self.__window = ctk.CTk()
         self.__screenWidth = self.__window.winfo_screenwidth()
         self.__screenHeight = self.__window.winfo_screenheight()
@@ -88,7 +89,7 @@ class Interface:
         self.__topRegister.title('Register')
         self.__x = (self.__screenWidth // 2) - (self.__topRegister.winfo_reqwidth() // 2)
         self.__y = (self.__screenHeight // 2) - (self.__topRegister.winfo_reqheight() // 2)
-        self.__topRegister.geometry("+{}+{}".format(self.__x, self.__y))
+        self.__topRegister.geometry("+{}+{}".format(self.__x + self.__spawnOffset, self.__y + self.__spawnOffset))
         self.__topRegister.geometry(f'{self.__windowWidth}x{self.__windowHeight}')
         self.__topRegister.resizable(False, False)
         self.__topRegister.attributes('-topmost', True)
@@ -114,17 +115,11 @@ class Interface:
                                               font=('@NSimSun', 20, 'bold'), command=self.__registerRequest)
 
         self.__registerTitleLabel.pack(pady=30)
-
         self.__registrationFeedbackLabel.pack()
-
         self.__registerUsernameEntry.pack(pady=10)
-
         self.__registerPasswordEntry.pack(pady=10)
-
         self.__repeatRegisterPasswordEntry.pack(pady=10)
-
         self.__termsBox.pack(pady=20)
-
         self.__registerButton.pack(pady=15)
 
     def __registerRequest(self):
@@ -162,7 +157,7 @@ class Interface:
         self.__topReset.title('Register')
         self.__x = (self.__screenWidth // 2) - (self.__topReset.winfo_reqwidth() // 2)
         self.__y = (self.__screenHeight // 2) - (self.__topReset.winfo_reqheight() // 2)
-        self.__topReset.geometry("+{}+{}".format(self.__x, self.__y))
+        self.__topReset.geometry("+{}+{}".format(self.__x + self.__spawnOffset, self.__y + self.__spawnOffset))
         self.__topReset.geometry(f'{self.__windowWidth}x{self.__windowHeight}')
         self.__topReset.resizable(False, False)
         self.__topReset.attributes('-topmost', True)
@@ -189,17 +184,11 @@ class Interface:
                                            font=('@NSimSun', 20, 'bold'), command=self.__resetRequest)
 
         self.__resetTitleLabel.pack(pady=25)
-
         self.__resetFeedbackLabel.pack()
-
         self.__resetUsernameEntry.pack(pady=10)
-
         self.__resetOldPasswordEntry.pack(pady=10)
-
         self.__resetNewPasswordEntry.pack(pady=10)
-
         self.__repeatResetNewPasswordEntry.pack(pady=10)
-
         self.__resetButton.pack(pady=30)
 
     def __resetRequest(self):

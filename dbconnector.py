@@ -13,7 +13,7 @@ class Connector:
         self.__reachability = None
 
         if (username == '' and password == '' and verifier is False) or (username != '' and password != '' and verifier is True):
-            raise ValueError('Incorrect arguments')
+            raise ValueError('Incorrect arguments.')
 
         if not verifier:
             self.__username = username
@@ -25,11 +25,8 @@ class Connector:
             self.__reachability = False
 
     def __config(self, filename='database.ini', section='postgresql'):
-        # Creates a parser
-        self.__parser = ConfigParser()
-
-        # Reads config file
-        self.__parser.read(filename)
+        self.__parser = ConfigParser()  # Creates a parser
+        self.__parser.read(filename)  # Reads config file
 
         # Get section, default to postgresql
         self.__db = {}
@@ -46,22 +43,16 @@ class Connector:
         """Connects to the PostgreSQL database server"""
         self.__conn = None
         try:
-            # Reads connection parameters
-            self.__params = self.__config()
+            self.__params = self.__config()  # Reads connection parameters
+            self.__conn = psycopg2.connect(**self.__params)  # Connects to the PostgreSQL server
+            self.__cur = self.__conn.cursor()  # Creates a cursor
 
-            # Connects to the PostgreSQL server
-            self.__conn = psycopg2.connect(**self.__params)
-
-            # Creates a cursor
-            self.__cur = self.__conn.cursor()
-
-            # Executes a statement
+            # Executes the query that checks for the user existence
             self.__cur.execute(f'SELECT username FROM users WHERE username = \'{self.__username}\' AND password = crypt(\'{self.__password}\', password)')
 
             self.__result = self.__cur.fetchone()
 
-            # Closes the communication with the PostgreSQL
-            self.__cur.close()
+            self.__cur.close()  # Closes the communication with the server
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
         finally:
@@ -78,23 +69,18 @@ class Connector:
         self.__conn = None
         self.__registrationComplete = False
         try:
-            # Reads connection parameters
-            self.__params = self.__config()
-
-            # Connects to the PostgreSQL server
-            self.__conn = psycopg2.connect(**self.__params)
-
-            # Creates a cursor
-            self.__cur = self.__conn.cursor()
+            self.__params = self.__config()  # Reads connection parameters
+            self.__conn = psycopg2.connect(**self.__params)  # Connects to the PostgreSQL server
+            self.__cur = self.__conn.cursor()  # Creates a cursor
 
             # Registers the user
-            self.__cur.execute(f'INSERT INTO users (username, password) VALUES (%s, crypt(%s, gen_salt(\'bf\')))', (self.__username, self.__password))
+            self.__cur.execute(f'INSERT INTO users (username, password) VALUES (%s, crypt(%s, gen_salt(\'bf\')))',
+                               (self.__username, self.__password))
 
             self.__conn.commit()
             self.__registrationComplete = True
 
-            # Closes the communication with the PostgreSQL
-            self.__cur.close()
+            self.__cur.close()  # Closes the communication with the server
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
         finally:
@@ -107,23 +93,18 @@ class Connector:
         self.__conn = None
         self.__resetComplete = False
         try:
-            # Reads connection parameters
-            self.__params = self.__config()
-
-            # Connects to the PostgreSQL server
-            self.__conn = psycopg2.connect(**self.__params)
-
-            # Creates a cursor
-            self.__cur = self.__conn.cursor()
+            self.__params = self.__config()  # Reads connection parameters
+            self.__conn = psycopg2.connect(**self.__params)  # Connects to the PostgreSQL server
+            self.__cur = self.__conn.cursor()  # Creates a cursor
 
             # Resets the user password
-            self.__cur.execute('UPDATE users SET password = crypt(%s, gen_salt(\'bf\')) WHERE username = %s', (self.__password, self.__username))
+            self.__cur.execute('UPDATE users SET password = crypt(%s, gen_salt(\'bf\')) WHERE username = %s',
+                               (self.__password, self.__username))
 
             self.__conn.commit()
             self.__resetComplete = True
 
-            # Closes the communication with the PostgreSQL
-            self.__cur.close()
+            self.__cur.close()  # Closes the communication with the server
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
         finally:
@@ -135,9 +116,7 @@ class Connector:
         """Verifies the reachability of the PostgreSQL database server"""
         self.__conn = None
         try:
-            # Reads connection parameters
-            self.__params = self.__config()
-
+            self.__params = self.__config()  # Reads connection parameters
             self.__conn = psycopg2.connect(**self.__params)
 
             if self.__conn is not None:
